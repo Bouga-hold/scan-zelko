@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan by Zelko — Rapport d'audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a2e1a;
+  --paper:#f4f1ea;
+  --cream:#e8e2d0;
+  --green:#2d5a27;
+  --green-light:#4a7c42;
+  --green-bg:#e8f0e8;
+  --red:#c0392b;
+  --red-bg:#fde8e0;
+  --red-border:#f5c0b0;
+  --orange:#d46a1a;
+  --orange-bg:#fef3e0;
+  --orange-border:#f5d090;
+  --yellow-bg:#fefbe0;
+  --yellow-border:#f0e090;
+  --muted:#5a6b5a;
+  --border:#c8d4c0;
+  --white:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
+
+header{padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--white)}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;letter-spacing:-0.02em;color:var(--ink);text-decoration:none}
+.logo span{color:var(--green)}
+.logo small{font-size:0.65rem;font-weight:300;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:0.4rem;letter-spacing:0.05em;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:1rem}
+.back-link{font-size:13px;color:var(--muted);text-decoration:none}
+.back-link:hover{color:var(--ink)}
+.btn-pdf{display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1.1rem;background:var(--green);color:var(--white);border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;text-decoration:none}
+.btn-pdf:hover{background:var(--green-light)}
+
+/* SUMMARY BAR */
+.summary-bar{background:var(--white);border-bottom:1px solid var(--border);padding:1.5rem 3rem}
+.summary-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
+.summary-file{display:flex;align-items:center;gap:0.75rem}
+.summary-file-icon{font-size:1.5rem}
+.summary-file-name{font-size:0.9rem;font-weight:500;color:var(--ink)}
+.summary-file-type{font-size:0.75rem;color:var(--muted);margin-top:0.1rem}
+.summary-scores{display:flex;align-items:center;gap:2rem}
+.score-block{text-align:center}
+.score-n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1}
+.score-n.red{color:var(--red)}
+.score-n.orange{color:var(--orange)}
+.score-n.green{color:var(--green)}
+.score-l{font-size:0.72rem;color:var(--muted);margin-top:0.2rem;text-transform:uppercase;letter-spacing:0.05em}
+.score-divider{width:1px;height:36px;background:var(--border)}
+
+/* SCORE GAUGE */
+.gauge-section{padding:2.5rem 3rem 2rem;max-width:900px;margin:0 auto}
+.gauge-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:2rem;display:flex;align-items:center;gap:3rem}
+.gauge-circle{position:relative;width:120px;height:120px;flex-shrink:0}
+.gauge-circle svg{transform:rotate(-90deg)}
+.gauge-circle-bg{fill:none;stroke:var(--border);stroke-width:10}
+.gauge-circle-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.gauge-score{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-score-n{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--ink);line-height:1}
+.gauge-score-l{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
+.gauge-info h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:0.4rem}
+.gauge-info p{font-size:0.88rem;color:var(--muted);line-height:1.6;max-width:500px}
+.gauge-verdict{display:inline-block;margin-top:0.75rem;padding:0.3rem 0.9rem;border-radius:6px;font-size:0.78rem;font-weight:500}
+.verdict-risk{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.verdict-medium{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.verdict-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--border)}
+
+/* FINDINGS */
+.findings-section{padding:0 3rem 2.5rem;max-width:900px;margin:0 auto}
+.findings-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:1.25rem}
+.findings-list{display:flex;flex-direction:column;gap:0.9rem}
+
+.finding{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;display:flex;gap:1.25rem;align-items:flex-start}
+.finding.critical{border-left:3px solid var(--red)}
+.finding.warning{border-left:3px solid var(--orange)}
+.finding.info{border-left:3px solid #8ab4e8}
+.finding.ok{border-left:3px solid var(--green)}
+
+.finding-icon{font-size:1.2rem;flex-shrink:0;margin-top:0.1rem}
+.finding-body{flex:1}
+.finding-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.4rem;flex-wrap:wrap}
+.finding-title{font-size:0.92rem;font-weight:500;color:var(--ink)}
+.finding-badge{font-size:0.6rem;padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.badge-critical{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.badge-warning{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border)}
+.badge-info{background:#e8f0fe;color:#1a5fa8;border:1px solid #b8d0f8}
+.badge-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--border)}
+.finding-desc{font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:0.6rem}
+.finding-suggestion{font-size:0.8rem;color:var(--green);background:var(--green-bg);border-radius:6px;padding:0.5rem 0.75rem;display:flex;align-items:flex-start;gap:0.5rem}
+.finding-suggestion::before{content:'💡';flex-shrink:0;font-size:0.85rem}
+
+/* SUMMARY TABLE */
+.table-section{padding:0 3rem 2.5rem;max-width:900px;margin:0 auto}
+.table-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:1.25rem}
+.clauses-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.clauses-table th{background:var(--paper);font-size:0.75rem;font-weight:500;color:var(--muted);padding:0.75rem 1rem;text-align:left;border-bottom:1px solid var(--border);letter-spacing:0.04em;text-transform:uppercase}
+.clauses-table td{font-size:0.82rem;color:var(--ink);padding:0.8rem 1rem;border-bottom:1px solid #f0ece4;vertical-align:middle}
+.clauses-table tr:last-child td{border-bottom:none}
+.clauses-table tr:hover td{background:#fafdf8}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:0.4rem}
+.dot-red{background:var(--red)}
+.dot-orange{background:var(--orange)}
+.dot-green{background:var(--green)}
+.dot-gray{background:#ccc}
+
+/* CTA */
+.cta-section{padding:0 3rem 3rem;max-width:900px;margin:0 auto}
+.cta-card{background:var(--green);border-radius:14px;padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.cta-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--white);margin-bottom:0.35rem}
+.cta-card p{font-size:0.85rem;color:#a8c8a8;line-height:1.5}
+.btn-white{font-size:0.85rem;padding:0.65rem 1.5rem;border-radius:8px;border:none;background:var(--white);color:var(--green);cursor:pointer;font-family:'Playfair Display',serif;font-weight:600;white-space:nowrap;text-decoration:none;display:inline-block}
+
+/* DISCLAIMER */
+.disclaimer{max-width:900px;margin:0 auto;padding:0 3rem 2rem}
+.disclaimer-box{background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:10px;padding:1rem 1.25rem;display:flex;gap:0.75rem}
+.disclaimer-text{font-size:0.75rem;color:#7a4010;line-height:1.6}
+
+footer{background:var(--white);border-top:1px solid var(--border);padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);font-weight:600}
+.footer-logo span{color:var(--green)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-link{font-size:0.78rem;color:var(--muted);text-decoration:none}
+.footer-copy{font-size:0.72rem;color:var(--border)}
+
+@media(max-width:680px){
+  header,.summary-bar,.gauge-section,.findings-section,.table-section,.cta-section,.disclaimer,footer{padding-left:1.25rem;padding-right:1.25rem}
+  .gauge-card{flex-direction:column;gap:1.5rem}
+  .summary-scores{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="https://scan.zelko.fr" class="logo">Scan<span>.</span><small>by zelko</small></a>
+  <div class="header-right">
+    <a href="https://scan.zelko.fr" class="back-link">← Nouvel audit</a>
+    <a href="#" class="btn-pdf" onclick="window.print()">📄 Télécharger PDF</a>
+  </div>
+</header>
+
+<!-- SUMMARY BAR -->
+<div class="summary-bar">
+  <div class="summary-inner">
+    <div class="summary-file">
+      <div class="summary-file-icon">📄</div>
+      <div>
+        <div class="summary-file-name" id="reportFileName">contrat-prestation.pdf</div>
+        <div class="summary-file-type">Contrat de prestation · Analysé le <span id="reportDate"></span></div>
+      </div>
+    </div>
+    <div class="summary-scores">
+      <div class="score-block">
+        <div class="score-n red" id="criticalCount">3</div>
+        <div class="score-l">Critiques</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div class="score-n orange" id="warningCount">2</div>
+        <div class="score-l">Avertissements</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-block">
+        <div class="score-n green" id="okCount">4</div>
+        <div class="score-l">Conformes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCORE GAUGE -->
+<div class="gauge-section">
+  <div class="gauge-card">
+    <div class="gauge-circle">
+      <svg viewBox="0 0 120 120" width="120" height="120">
+        <circle class="gauge-circle-bg" cx="60" cy="60" r="50"/>
+        <circle class="gauge-circle-fill" id="gaugeFill" cx="60" cy="60" r="50"
+          stroke="#c0392b"
+          stroke-dasharray="314"
+          stroke-dashoffset="188"/>
+      </svg>
+      <div class="gauge-score">
+        <div class="gauge-score-n" id="gaugeScore">40</div>
+        <div class="gauge-score-l">/ 100</div>
+      </div>
+    </div>
+    <div class="gauge-info">
+      <h2>Contrat à risques élevés</h2>
+      <p>Notre analyse a identifié <strong>3 clauses critiques</strong> qui vous exposent à des risques juridiques significatifs. Plusieurs protections essentielles sont absentes ou déséquilibrées en faveur de l'autre partie.</p>
+      <span class="gauge-verdict verdict-risk">⚠️ Nécessite des modifications avant signature</span>
+    </div>
+  </div>
+</div>
+
+<!-- FINDINGS -->
+<div class="findings-section">
+  <div class="findings-title">Analyse détaillée des clauses</div>
+  <div class="findings-list">
+
+    <div class="finding critical">
+      <div class="finding-icon">🚨</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Responsabilité illimitée du prestataire</div>
+          <span class="finding-badge badge-critical">Critique</span>
+        </div>
+        <div class="finding-desc">Le contrat ne contient aucune clause limitant votre responsabilité en cas de dommages. En cas de litige, vous pourriez être tenu responsable au-delà de la valeur de la mission, y compris pour des dommages indirects ou consécutifs.</div>
+        <div class="finding-suggestion">Ajoutez une clause de limitation de responsabilité plafonnée au montant total de la prestation, et excluez expressément les dommages indirects (art. 1231-3 C.civ.).</div>
+      </div>
+    </div>
+
+    <div class="finding critical">
+      <div class="finding-icon">🚨</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Propriété intellectuelle non définie</div>
+          <span class="finding-badge badge-critical">Critique</span>
+        </div>
+        <div class="finding-desc">Aucune clause ne précise à qui appartiennent les livrables une fois la mission terminée. Sans précision contractuelle, la propriété intellectuelle reste présumée appartenir au créateur (vous), mais cela peut générer des litiges coûteux.</div>
+        <div class="finding-suggestion">Précisez explicitement les conditions de cession des droits : est-ce une cession totale ou une licence d'utilisation ? Listez les types d'œuvres concernées et les territoires couverts (art. L131-3 CPI).</div>
+      </div>
+    </div>
+
+    <div class="finding critical">
+      <div class="finding-icon">🚨</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Absence de clause de résiliation</div>
+          <span class="finding-badge badge-critical">Critique</span>
+        </div>
+        <div class="finding-desc">Le contrat ne prévoit aucune condition de résiliation anticipée. Le client peut mettre fin à la mission sans préavis ni indemnité, vous laissant sans recours en cas d'interruption soudaine d'une mission en cours.</div>
+        <div class="finding-suggestion">Intégrez une clause de résiliation avec un préavis minimum (ex. 30 jours) et une indemnité de résiliation correspondant au travail accompli plus un pourcentage du montant restant.</div>
+      </div>
+    </div>
+
+    <div class="finding warning">
+      <div class="finding-icon">⚠️</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Délais de paiement flous</div>
+          <span class="finding-badge badge-warning">Avertissement</span>
+        </div>
+        <div class="finding-desc">Le contrat mentionne un paiement "à réception de facture" sans préciser de délai maximum. En droit français, l'art. L441-10 C.com. fixe un délai maximum de 30 jours (60 jours en accord des parties), mais en l'absence de précision, les litiges sur les retards sont fréquents.</div>
+        <div class="finding-suggestion">Précisez un délai de paiement exact (ex. "30 jours calendaires à compter de la date de facture") et des pénalités de retard (taux légal × 3 minimum selon l'usage).</div>
+      </div>
+    </div>
+
+    <div class="finding warning">
+      <div class="finding-icon">⚠️</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Clause de confidentialité trop vague</div>
+          <span class="finding-badge badge-warning">Avertissement</span>
+        </div>
+        <div class="finding-desc">La clause de confidentialité ne définit pas précisément ce qui constitue une "information confidentielle". Une définition trop large ou trop vague peut être difficile à faire respecter en cas de litige.</div>
+        <div class="finding-suggestion">Listez les catégories d'informations confidentielles (données clients, savoir-faire, tarifs, etc.) et précisez la durée de l'obligation (généralement 3 à 5 ans après la fin du contrat).</div>
+      </div>
+    </div>
+
+    <div class="finding ok">
+      <div class="finding-icon">✅</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Identification des parties</div>
+          <span class="finding-badge badge-ok">Conforme</span>
+        </div>
+        <div class="finding-desc">Les deux parties sont correctement identifiées avec leur dénomination sociale, SIRET et adresse de siège social.</div>
+      </div>
+    </div>
+
+    <div class="finding ok">
+      <div class="finding-icon">✅</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Description de la mission</div>
+          <span class="finding-badge badge-ok">Conforme</span>
+        </div>
+        <div class="finding-desc">L'objet de la prestation est décrit avec suffisamment de précision pour éviter les litiges sur le périmètre des livrables attendus.</div>
+      </div>
+    </div>
+
+    <div class="finding ok">
+      <div class="finding-icon">✅</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Clause attributive de juridiction</div>
+          <span class="finding-badge badge-ok">Conforme</span>
+        </div>
+        <div class="finding-desc">Le tribunal compétent en cas de litige est clairement désigné, évitant toute incertitude procédurale.</div>
+      </div>
+    </div>
+
+    <div class="finding ok">
+      <div class="finding-icon">✅</div>
+      <div class="finding-body">
+        <div class="finding-header">
+          <div class="finding-title">Droit applicable</div>
+          <span class="finding-badge badge-ok">Conforme</span>
+        </div>
+        <div class="finding-desc">Le contrat précise expressément que le droit français est applicable, ce qui est essentiel notamment pour les relations avec des clients étrangers.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUMMARY TABLE -->
+<div class="table-section">
+  <div class="table-title">Tableau récapitulatif</div>
+  <table class="clauses-table">
+    <thead>
+      <tr>
+        <th>Clause</th>
+        <th>Statut</th>
+        <th>Priorité</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Limitation de responsabilité</td>
+        <td><span class="status-dot dot-red"></span>Absente</td>
+        <td>🔴 Critique</td>
+      </tr>
+      <tr>
+        <td>Propriété intellectuelle</td>
+        <td><span class="status-dot dot-red"></span>Non définie</td>
+        <td>🔴 Critique</td>
+      </tr>
+      <tr>
+        <td>Conditions de résiliation</td>
+        <td><span class="status-dot dot-red"></span>Absente</td>
+        <td>🔴 Critique</td>
+      </tr>
+      <tr>
+        <td>Délais de paiement</td>
+        <td><span class="status-dot dot-orange"></span>Insuffisant</td>
+        <td>🟠 Avertissement</td>
+      </tr>
+      <tr>
+        <td>Confidentialité</td>
+        <td><span class="status-dot dot-orange"></span>Trop vague</td>
+        <td>🟠 Avertissement</td>
+      </tr>
+      <tr>
+        <td>Identification des parties</td>
+        <td><span class="status-dot dot-green"></span>Conforme</td>
+        <td>✅ OK</td>
+      </tr>
+      <tr>
+        <td>Description de la mission</td>
+        <td><span class="status-dot dot-green"></span>Conforme</td>
+        <td>✅ OK</td>
+      </tr>
+      <tr>
+        <td>Attribution de juridiction</td>
+        <td><span class="status-dot dot-green"></span>Conforme</td>
+        <td>✅ OK</td>
+      </tr>
+      <tr>
+        <td>Droit applicable</td>
+        <td><span class="status-dot dot-green"></span>Conforme</td>
+        <td>✅ OK</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-card">
+    <div>
+      <h3>Besoin d'un contrat sécurisé ?</h3>
+      <p>Générez un contrat de prestation complet et conforme avec Lex by Zelko — toutes les clauses manquantes incluses.</p>
+    </div>
+    <a href="https://www.zelko.fr/lex.html" class="btn-white">Générer un contrat →</a>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <div class="disclaimer-box">
+    <div>⚠️</div>
+    <div class="disclaimer-text">
+      <strong>Avertissement :</strong> Ce rapport est fourni à titre informatif uniquement et ne constitue pas un conseil juridique. Il ne remplace pas la consultation d'un avocat qualifié. Zelko ne peut être tenu responsable des décisions prises sur la base de cette analyse. Pour les contrats à forts enjeux, consultez un professionnel du droit.
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Scan<span>.</span> <span style="font-size:0.7rem;font-weight:300;color:var(--muted);font-family:'DM Sans',sans-serif">by Zelko</span></div>
+  <div class="footer-links">
+    <a href="https://www.zelko.fr" class="footer-link">zelko.fr</a>
+    <a href="https://www.zelko.fr/cgu.html" class="footer-link">CGU</a>
+    <a href="mailto:contact@zelko.fr" class="footer-link">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Zelko · Tous droits réservés</div>
+</footer>
+
+<script>
+// Set date
+document.getElementById('reportDate').textContent = new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+
+// Animate gauge
+const urlParams = new URLSearchParams(window.location.search);
+const score = urlParams.get('score') || 40;
+const circumference = 314;
+const offset = circumference - (score / 100) * circumference;
+document.getElementById('gaugeFill').style.strokeDashoffset = offset;
+document.getElementById('gaugeScore').textContent = score;
+
+// Color gauge based on score
+const fill = document.getElementById('gaugeFill');
+if(score >= 70) fill.style.stroke = '#2d5a27';
+else if(score >= 40) fill.style.stroke = '#d46a1a';
+else fill.style.stroke = '#c0392b';
+</script>
+
+</body>
+</html>
