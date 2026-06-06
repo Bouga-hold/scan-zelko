@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan by Zelko — Audit contractuel par IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a2e1a;
+  --paper:#f4f1ea;
+  --cream:#e8e2d0;
+  --green:#2d5a27;
+  --green-light:#4a7c42;
+  --green-bg:#e8f0e8;
+  --red:#c0392b;
+  --red-bg:#fde8e0;
+  --orange:#d46a1a;
+  --orange-bg:#fef3e0;
+  --muted:#5a6b5a;
+  --border:#c8d4c0;
+  --white:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;font-weight:300;min-height:100vh}
+
+/* HEADER */
+header{padding:1.5rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--white)}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;letter-spacing:-0.02em;color:var(--ink);text-decoration:none}
+.logo span{color:var(--green)}
+.logo small{font-size:0.65rem;font-weight:300;color:var(--muted);font-family:'DM Sans',sans-serif;margin-left:0.4rem;letter-spacing:0.05em;text-transform:uppercase}
+.back-link{font-size:13px;color:var(--muted);text-decoration:none}
+.back-link:hover{color:var(--ink)}
+
+/* HERO */
+.hero{padding:4rem 3rem 3rem;max-width:860px;margin:0 auto;text-align:center}
+.hero-tag{display:inline-block;background:var(--green-bg);color:var(--green);font-size:0.72rem;padding:0.3rem 1rem;border-radius:100px;margin-bottom:1.5rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--border)}
+.hero h1{font-family:'Playfair Display',serif;font-weight:700;font-size:2.6rem;line-height:1.15;color:var(--ink);margin-bottom:0.9rem}
+.hero h1 em{font-style:italic;color:var(--green)}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:500px;margin:0 auto 2rem;line-height:1.7}
+
+/* TRUST */
+.trust{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;padding:1.25rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.trust-item{display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--muted)}
+
+/* UPLOAD SECTION */
+.upload-section{padding:3rem;max-width:860px;margin:0 auto}
+.upload-card{background:var(--white);border:1.5px dashed var(--border);border-radius:16px;padding:3rem 2rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative}
+.upload-card:hover{border-color:var(--green);background:#fafdf8}
+.upload-card.dragover{border-color:var(--green);background:#f0f7f0;transform:scale(1.01)}
+.upload-icon{font-size:3rem;margin-bottom:1rem}
+.upload-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem}
+.upload-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.upload-formats{font-size:0.75rem;color:var(--muted);margin-bottom:1.5rem}
+.upload-formats span{background:var(--cream);padding:0.2rem 0.6rem;border-radius:4px;margin:0 0.2rem;font-weight:500}
+.btn-upload{display:inline-flex;align-items:center;gap:0.5rem;padding:0.8rem 2rem;background:var(--green);color:var(--white);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:background 0.15s}
+.btn-upload:hover{background:var(--green-light)}
+#fileInput{display:none}
+.file-selected{display:none;margin-top:1.5rem;padding:1rem 1.5rem;background:var(--green-bg);border:1px solid var(--border);border-radius:10px;align-items:center;justify-content:space-between;gap:1rem}
+.file-selected.visible{display:flex}
+.file-name{font-size:0.88rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:0.5rem}
+.file-remove{font-size:0.78rem;color:var(--red);cursor:pointer;text-decoration:underline}
+
+/* CONTRACT TYPE */
+.type-section{padding:0 3rem 2rem;max-width:860px;margin:0 auto}
+.type-label{font-size:0.85rem;font-weight:500;color:var(--ink);margin-bottom:0.75rem}
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem}
+.type-btn{padding:0.7rem 0.5rem;background:var(--white);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.15s;text-align:center}
+.type-btn:hover{border-color:var(--green);color:var(--green)}
+.type-btn.selected{background:var(--green-bg);border-color:var(--green);color:var(--green);font-weight:500}
+
+/* ANALYSE BTN */
+.analyse-section{padding:0 3rem 3rem;max-width:860px;margin:0 auto}
+.btn-analyse{width:100%;padding:1rem;background:var(--ink);color:var(--white);border:none;border-radius:10px;font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:background 0.15s;display:flex;align-items:center;justify-content:center;gap:0.75rem}
+.btn-analyse:hover{background:var(--green)}
+.btn-analyse:disabled{background:#ccc;cursor:not-allowed}
+.price-note{text-align:center;font-size:0.78rem;color:var(--muted);margin-top:0.75rem}
+.price-note strong{color:var(--ink)}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:3rem;max-width:860px;margin:0 auto}
+.loading.visible{display:block}
+.loading-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:0.5rem}
+.loading-sub{font-size:0.85rem;color:var(--muted)}
+.loading-steps{display:flex;flex-direction:column;gap:0.5rem;margin-top:1.5rem;max-width:340px;margin-left:auto;margin-right:auto}
+.loading-step{display:flex;align-items:center;gap:0.75rem;font-size:0.82rem;color:var(--muted);padding:0.5rem 0.75rem;background:var(--white);border-radius:8px;border:1px solid var(--border)}
+.loading-step.active{color:var(--green);border-color:var(--green);background:var(--green-bg)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.loading-step.active .step-dot{background:var(--green)}
+
+/* WHAT WE CHECK */
+.checks-section{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3rem}
+.checks-inner{max-width:860px;margin:0 auto}
+.checks-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:0.4rem}
+.checks-sub{font-size:0.85rem;color:var(--muted);margin-bottom:2rem}
+.checks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.check-card{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:1.25rem}
+.check-card-title{font-size:0.9rem;font-weight:500;color:var(--ink);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}
+.check-items{display:flex;flex-direction:column;gap:0.4rem}
+.check-item{font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem}
+.check-item::before{content:'→';color:var(--green);font-size:0.7rem;flex-shrink:0}
+
+/* DISCLAIMER */
+.disclaimer{max-width:860px;margin:2rem auto;padding:0 3rem}
+.disclaimer-box{background:var(--orange-bg);border:1px solid #f5c89a;border-radius:10px;padding:1rem 1.25rem;display:flex;gap:0.75rem;align-items:flex-start}
+.disclaimer-icon{font-size:1.1rem;flex-shrink:0;margin-top:0.1rem}
+.disclaimer-text{font-size:0.78rem;color:#7a4010;line-height:1.6}
+
+/* FOOTER */
+footer{margin-top:3rem;background:var(--white);border-top:1px solid var(--border);padding:1.75rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);font-weight:600}
+.footer-logo span{color:var(--green)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-link{font-size:0.78rem;color:var(--muted);text-decoration:none}
+.footer-link:hover{color:var(--ink)}
+.footer-copy{font-size:0.72rem;color:var(--border)}
+
+@media(max-width:680px){
+  header{padding:1rem 1.25rem}
+  .hero{padding:2.5rem 1.25rem 2rem}
+  .hero h1{font-size:2rem}
+  .upload-section,.type-section,.analyse-section,.disclaimer{padding-left:1.25rem;padding-right:1.25rem}
+  .checks-section{padding:2rem 1.25rem}
+  .checks-grid{grid-template-columns:1fr}
+  .type-grid{grid-template-columns:repeat(2,1fr)}
+  footer{padding:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="https://www.zelko.fr" class="logo">Scan<span>.</span><small>by zelko</small></a>
+  <a href="https://www.zelko.fr" class="back-link">← Retour à Zelko</a>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">Audit contractuel par IA · Droit français</div>
+  <h1>Votre contrat est-il<br><em>vraiment protecteur ?</em></h1>
+  <p class="hero-sub">Uploadez votre contrat. Notre IA analyse les clauses déséquilibrées, les risques juridiques et vous remet un rapport clair en quelques secondes.</p>
+  <div class="trust">
+    <div class="trust-item">🔍 Analyse IA avancée</div>
+    <div class="trust-item">⚖️ Droit français</div>
+    <div class="trust-item">📄 Rapport PDF inclus</div>
+    <div class="trust-item">🔒 Contrat non stocké</div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<div class="upload-section">
+  <div class="upload-card" id="uploadCard" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+    <div class="upload-icon">📄</div>
+    <div class="upload-title">Déposez votre contrat ici</div>
+    <p class="upload-sub">Glissez-déposez votre fichier ou cliquez pour parcourir.<br>Votre document n'est jamais stocké sur nos serveurs.</p>
+    <div class="upload-formats">Formats acceptés : <span>PDF</span> <span>DOCX</span> <span>TXT</span></div>
+    <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('fileInput').click()">📂 Choisir un fichier</button>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt" onchange="handleFileSelect(event)">
+    <div class="file-selected" id="fileSelected">
+      <div class="file-name">📄 <span id="fileName"></span></div>
+      <span class="file-remove" onclick="event.stopPropagation();removeFile()">Supprimer</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONTRACT TYPE -->
+<div class="type-section">
+  <div class="type-label">Type de contrat (optionnel — améliore la précision)</div>
+  <div class="type-grid">
+    <button class="type-btn" onclick="selectType(this, 'prestation')">📋 Prestation</button>
+    <button class="type-btn" onclick="selectType(this, 'nda')">🤝 NDA</button>
+    <button class="type-btn" onclick="selectType(this, 'cgv')">🛒 CGV</button>
+    <button class="type-btn" onclick="selectType(this, 'bail')">🏪 Bail commercial</button>
+  </div>
+</div>
+
+<!-- ANALYSE BTN -->
+<div class="analyse-section">
+  <button class="btn-analyse" id="analyseBtn" onclick="startAnalysis()" disabled>
+    🔍 Analyser mon contrat
+  </button>
+  <div class="price-note">Audit complet · <strong>9,99€</strong> · Rapport PDF téléchargeable</div>
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loadingSection">
+  <div class="loading-spinner"></div>
+  <div class="loading-title">Analyse en cours…</div>
+  <div class="loading-sub">Notre IA examine votre contrat clause par clause.</div>
+  <div class="loading-steps">
+    <div class="loading-step active" id="step1"><div class="step-dot"></div>Lecture du document</div>
+    <div class="loading-step" id="step2"><div class="step-dot"></div>Identification des clauses</div>
+    <div class="loading-step" id="step3"><div class="step-dot"></div>Analyse des risques juridiques</div>
+    <div class="loading-step" id="step4"><div class="step-dot"></div>Génération du rapport</div>
+  </div>
+</div>
+
+<!-- WHAT WE CHECK -->
+<div class="checks-section">
+  <div class="checks-inner">
+    <div class="checks-title">Ce que Scan analyse</div>
+    <div class="checks-sub">Selon le type de contrat, notre IA vérifie les points critiques suivants.</div>
+    <div class="checks-grid">
+      <div class="check-card">
+        <div class="check-card-title">📋 Contrat de prestation</div>
+        <div class="check-items">
+          <div class="check-item">Clause de responsabilité limitée</div>
+          <div class="check-item">Délais de paiement et pénalités</div>
+          <div class="check-item">Propriété intellectuelle</div>
+          <div class="check-item">Clause de non-concurrence</div>
+          <div class="check-item">Conditions de résiliation</div>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-card-title">🤝 NDA / Confidentialité</div>
+        <div class="check-items">
+          <div class="check-item">Durée de confidentialité</div>
+          <div class="check-item">Périmètre trop large ou vague</div>
+          <div class="check-item">Définition des informations protégées</div>
+          <div class="check-item">Sanctions disproportionnées</div>
+          <div class="check-item">Exceptions non prévues</div>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-card-title">🛒 CGV</div>
+        <div class="check-items">
+          <div class="check-item">Mentions obligatoires (L.441-1 C.com.)</div>
+          <div class="check-item">Clause attributive de juridiction</div>
+          <div class="check-item">Limitation de garantie</div>
+          <div class="check-item">Délais de livraison et responsabilité</div>
+          <div class="check-item">Droit de rétractation (B2C)</div>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-card-title">🏪 Bail commercial</div>
+        <div class="check-items">
+          <div class="check-item">Durée et renouvellement (3-6-9)</div>
+          <div class="check-item">Clause d'indexation (ILC/ILAT)</div>
+          <div class="check-item">Répartition charges et travaux</div>
+          <div class="check-item">Droit au renouvellement</div>
+          <div class="check-item">Clause résolutoire</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  <div class="disclaimer-box">
+    <div class="disclaimer-icon">⚠️</div>
+    <div class="disclaimer-text">
+      <strong>Information importante :</strong> L'analyse fournie par Scan est à titre informatif et ne constitue pas un conseil juridique. Elle ne remplace pas la consultation d'un avocat pour les contrats à forts enjeux. Zelko ne peut être tenu responsable des décisions prises sur la base de ce rapport.
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">Scan<span>.</span> <span style="font-size:0.7rem;font-weight:300;color:var(--muted);font-family:'DM Sans',sans-serif">by Zelko</span></div>
+  <div class="footer-links">
+    <a href="https://www.zelko.fr" class="footer-link">zelko.fr</a>
+    <a href="https://www.zelko.fr/cgu.html" class="footer-link">CGU</a>
+    <a href="https://www.zelko.fr/mentions-legales.html" class="footer-link">Mentions légales</a>
+    <a href="mailto:contact@zelko.fr" class="footer-link">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 Zelko · Tous droits réservés</div>
+</footer>
+
+<script>
+let selectedFile = null;
+let selectedType = null;
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) setFile(file);
+}
+
+function setFile(file) {
+  selectedFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSelected').classList.add('visible');
+  document.getElementById('analyseBtn').disabled = false;
+}
+
+function removeFile() {
+  selectedFile = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileSelected').classList.remove('visible');
+  document.getElementById('analyseBtn').disabled = true;
+}
+
+function selectType(btn, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedType = type;
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('uploadCard').classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  document.getElementById('uploadCard').classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadCard').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) setFile(file);
+}
+
+function startAnalysis() {
+  if (!selectedFile) return;
+  document.querySelector('.upload-section').style.display = 'none';
+  document.querySelector('.type-section').style.display = 'none';
+  document.querySelector('.analyse-section').style.display = 'none';
+  document.getElementById('loadingSection').classList.add('visible');
+  animateSteps();
+  // Ici : appel API /api/scan avec le fichier
+  // Pour l'instant on simule la redirection
+  setTimeout(() => {
+    window.location.href = 'result.html?demo=true';
+  }, 4000);
+}
+
+function animateSteps() {
+  const steps = ['step1','step2','step3','step4'];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < steps.length) {
+      document.querySelectorAll('.loading-step').forEach(s => s.classList.remove('active'));
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 900);
+}
+</script>
+
+</body>
+</html>
