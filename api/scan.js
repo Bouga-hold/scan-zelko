@@ -1,34 +1,33 @@
-import Anthropic from "@anthropic-ai/sdk";
+const Anthropic = require("@anthropic-ai/sdk");
 
-export const config = { api: { bodyParser: false } };
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // Lire le body brut (multipart)
     const chunks = [];
     for await (const chunk of req) chunks.push(chunk);
     const buffer = Buffer.concat(chunks);
     const body = buffer.toString();
 
-    // Extraire le texte du contrat et le type
-    const boundary = req.headers["content-type"].split("boundary=")[1];
-    const parts = body.split("--" + boundary);
+    const contentType = req.headers["content-type"] || "";
+    const boundary = contentType.split("boundary=")[1];
 
     let contractText = "";
     let contractType = "contrat";
 
-    for (const part of parts) {
-      if (part.includes('name="text"')) {
-        contractText = part.split("\r\n\r\n").slice(1).join("\r\n\r\n").trim();
-        if (contractText.endsWith("\r\n")) contractText = contractText.slice(0, -2);
-      }
-      if (part.includes('name="type"')) {
-        contractType = part.split("\r\n\r\n").slice(1).join("").trim();
-        if (contractType.endsWith("\r\n")) contractType = contractType.slice(0, -2);
+    if (boundary) {
+      const parts = body.split("--" + boundary);
+      for (const part of parts) {
+        if (part.includes('name="text"')) {
+          contractText = part.split("\r\n\r\n").slice(1).join("\r\n\r\n").trim();
+          if (contractText.endsWith("\r\n")) contractText = contractText.slice(0, -2);
+        }
+        if (part.includes('name="type"')) {
+          contractType = part.split("\r\n\r\n").slice(1).join("").trim();
+          if (contractType.endsWith("\r\n")) contractType = contractType.slice(0, -2);
+        }
       }
     }
 
@@ -89,4 +88,4 @@ Règles :
     console.error("Scan error:", err);
     return res.status(500).json({ error: "Erreur lors de l'analyse. Réessayez." });
   }
-}
+};
