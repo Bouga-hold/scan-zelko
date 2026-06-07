@@ -403,22 +403,100 @@ footer{background:var(--white);border-top:1px solid var(--border);padding:1.5rem
 </footer>
 
 <script>
-// Set date
 document.getElementById('reportDate').textContent = new Date().toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
 
-// Animate gauge
-const urlParams = new URLSearchParams(window.location.search);
-const score = urlParams.get('score') || 40;
-const circumference = 314;
-const offset = circumference - (score / 100) * circumference;
-document.getElementById('gaugeFill').style.strokeDashoffset = offset;
-document.getElementById('gaugeScore').textContent = score;
+const raw = sessionStorage.getItem('scanResult');
+if (!raw) {
+  // Mode démo si pas de données
+  renderDemo();
+} else {
+  renderResult(JSON.parse(raw));
+}
 
-// Color gauge based on score
-const fill = document.getElementById('gaugeFill');
-if(score >= 70) fill.style.stroke = '#2d5a27';
-else if(score >= 40) fill.style.stroke = '#d46a1a';
-else fill.style.stroke = '#c0392b';
+function renderDemo() {
+  renderResult({
+    score: 40, verdict: "Contrat à risques — plusieurs clauses importantes manquantes",
+    critiques: 3, avertissements: 2, ok: 4,
+    fileName: "contrat-demo.pdf", contractType: "Contrat de prestation",
+    findings: [
+      { level: "critical", title: "Clause de limitation de responsabilité absente", description: "Aucune clause ne limite votre responsabilité en cas de dommages indirects ou de dépassement du montant du contrat.", suggestion: "Ajoutez une clause limitant votre responsabilité au montant total du contrat et excluant les dommages indirects (art. 1231-3 C.civ.)." },
+      { level: "warning", title: "Délais de paiement insuffisants", description: "Les conditions de paiement ne précisent pas les pénalités de retard obligatoires (art. L.441-10 C.com.).", suggestion: "Mentionnez un taux de pénalité (minimum 3× le taux légal) et l'indemnité forfaitaire de 40€ pour frais de recouvrement." },
+      { level: "ok", title: "Identification des parties", description: "Les deux parties sont correctement identifiées.", suggestion: null }
+    ],
+    clauses: [
+      { name: "Limitation de responsabilité", status: "Absente", priority: "critique" },
+      { name: "Délais de paiement", status: "Insuffisant", priority: "avertissement" },
+      { name: "Identification des parties", status: "Conforme", priority: "ok" }
+    ]
+  });
+}
+
+function renderResult(data) {
+  const score = data.score || 40;
+  const circumference = 314;
+  const offset = circumference - (score / 100) * circumference;
+  document.getElementById('gaugeFill').style.strokeDashoffset = offset;
+  document.getElementById('gaugeScore').textContent = score;
+
+  const fill = document.getElementById('gaugeFill');
+  if (score >= 70) fill.style.stroke = '#2d5a27';
+  else if (score >= 40) fill.style.stroke = '#d46a1a';
+  else fill.style.stroke = '#c0392b';
+
+  if (data.fileName) document.getElementById('reportFileName').textContent = data.fileName;
+  if (data.critiques !== undefined) document.getElementById('criticalCount').textContent = data.critiques;
+  if (data.avertissements !== undefined) document.getElementById('warningCount').textContent = data.avertissements;
+
+  // Verdict
+  const verdictEl = document.querySelector('.gauge-verdict');
+  if (verdictEl && data.verdict) verdictEl.textContent = data.verdict;
+
+  // Gauge title
+  const gaugeH2 = document.querySelector('.gauge-info h2');
+  if (gaugeH2) {
+    if (score >= 70) gaugeH2.textContent = "Contrat globalement sécurisé";
+    else if (score >= 40) gaugeH2.textContent = "Contrat à améliorer";
+    else gaugeH2.textContent = "Contrat à risques élevés";
+  }
+
+  // Findings
+  if (data.findings && data.findings.length) {
+    const container = document.querySelector('.findings-list');
+    if (container) {
+      container.innerHTML = data.findings.map(f => {
+        const levelMap = { critical: ['critical','🚨','badge-critical','Critique'], warning: ['warning','⚠️','badge-warning','Avertissement'], info: ['info','ℹ️','badge-info','Info'], ok: ['ok','✅','badge-ok','Conforme'] };
+        const [cls, icon, badge, label] = levelMap[f.level] || levelMap['info'];
+        return `<div class="finding ${cls}">
+          <div class="finding-icon">${icon}</div>
+          <div class="finding-body">
+            <div class="finding-header">
+              <div class="finding-title">${f.title}</div>
+              <span class="finding-badge ${badge}">${label}</span>
+            </div>
+            <div class="finding-desc">${f.description}</div>
+            ${f.suggestion ? `<div class="finding-suggestion">${f.suggestion}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Clauses table
+  if (data.clauses && data.clauses.length) {
+    const tbody = document.querySelector('.clauses-table tbody');
+    if (tbody) {
+      tbody.innerHTML = data.clauses.map(c => {
+        const dotMap = { critique: 'dot-red', avertissement: 'dot-orange', ok: 'dot-green', na: 'dot-gray' };
+        const emojiMap = { critique: '🔴 Critique', avertissement: '🟠 Avertissement', ok: '✅ OK', na: '⚪ N/A' };
+        return `<tr>
+          <td>${c.name}</td>
+          <td><span class="status-dot ${dotMap[c.priority] || 'dot-gray'}"></span>${c.status}</td>
+          <td>${emojiMap[c.priority] || c.priority}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+}
 </script>
 
 </body>

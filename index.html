@@ -312,18 +312,70 @@ function handleDrop(e) {
   if (file) setFile(file);
 }
 
-function startAnalysis() {
+async function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+async function startAnalysis() {
   if (!selectedFile) return;
+
   document.querySelector('.upload-section').style.display = 'none';
   document.querySelector('.type-section').style.display = 'none';
   document.querySelector('.analyse-section').style.display = 'none';
   document.getElementById('loadingSection').classList.add('visible');
   animateSteps();
-  // Ici : appel API /api/scan avec le fichier
-  // Pour l'instant on simule la redirection
-  setTimeout(() => {
-    window.location.href = 'result.html?demo=true';
-  }, 4000);
+
+  try {
+    let contractText = '';
+
+    // Lire le fichier selon son type
+    if (selectedFile.type === 'application/pdf') {
+      // Pour PDF : on envoie le fichier en binaire via FormData
+      contractText = '[PDF]';
+    } else {
+      contractText = await readFileAsText(selectedFile);
+    }
+
+    const formData = new FormData();
+    formData.append('text', contractText === '[PDF]' ? '' : contractText);
+    formData.append('type', selectedType || 'contrat');
+    if (selectedFile.type === 'application/pdf') {
+      formData.append('file', selectedFile);
+    }
+
+    const response = await fetch('/api/scan', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Erreur serveur');
+    }
+
+    const data = await response.json();
+
+    // Stocker le résultat et rediriger
+    sessionStorage.setItem('scanResult', JSON.stringify({
+      ...data,
+      fileName: selectedFile.name,
+      contractType: selectedType || 'contrat'
+    }));
+
+    window.location.href = 'result.html';
+
+  } catch (err) {
+    document.getElementById('loadingSection').classList.remove('visible');
+    document.querySelector('.upload-section').style.display = '';
+    document.querySelector('.type-section').style.display = '';
+    document.querySelector('.analyse-section').style.display = '';
+    alert('Erreur : ' + err.message);
+  }
 }
 
 function animateSteps() {
